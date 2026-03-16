@@ -40,3 +40,6 @@ Use the Print or Save PDF buttons to keep a record of your preparation.
 ⚖️ License & Copyright
 © 2026 Piyush Pandey. All rights reserved.
 This tool is intended for educational purposes to help students estimate their exam scores.
+
+##License
+This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE] (LICENSE) file for details.
