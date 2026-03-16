@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Marks Calculator by Piyush Pandey</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 100px; /* Space for install button */
+        }
+        
+        .logo-container { text-align: center; margin-bottom: 10px; }
+        .logo-container img {
+            width: 80px; height: auto;
+            border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            background: white; padding: 2rem; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%; max-width: 650px; margin-bottom: 20px;
+        }
+
+        h1 { text-align: center; color: #1a2a3a; margin: 10px 0; font-size: 24px; }
+        
+        .tabs { display: flex; justify-content: center; margin-bottom: 25px; border-bottom: 2px solid #eee; }
+        .tab-btn { padding: 12px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: 600; color: #888; transition: 0.3s; }
+        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
+        
+        .calculator-section { display: none; }
+        .calculator-section.active { display: block; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #444; }
+        input { width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        
+        .calc-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background-color: #28a745; color: white; margin-top: 10px; }
+
+        .chart-container, .history-container {
+            width: 100%; max-width: 700px; background: white; border-radius: 12px;
+            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+
+        table.history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        .history-table th, .history-table td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        
+        .action-btns { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .pdf-btn { background-color: #dc3545; color: white; flex: 1; }
+        .print-btn { background-color: #007bff; color: white; flex: 1; }
+        .clear-btn { background-color: #6c757d; color: white; flex: 1; }
+
+        /* Mobile Install Button Style */
+        .install-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a2a3a;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .install-btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer-line { padding: 20px; color: #666; font-weight: 500; text-align: center; }
+
+        @media print {
+            .container, .action-btns, .logo-container, .tabs, .install-bar { display: none !important; }
+            .print-footer { display: block !important; position: fixed; bottom: 0; width: 100%; text-align: center; border-top: 1px solid #ddd; padding: 10px; }
+        }
+        .print-footer { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="logo-container">
+    <img src="https://drive.google.com/file/d/1ZqLi3ShQKP63BapRwAlhFErgW_5bvNDP/view?usp=drivesdk" alt="Logo">
+</div>
+
+<div class="container">
+    <h1>Exam Marks Calculator</h1>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('cgpsc', event)">CGPSC</button>
+        <button class="tab-btn" onclick="openTab('vyapam', event)">CG Vyapam</button>
+    </div>
+
+    <div id="cgpsc" class="calculator-section active">
+        <div class="input-group">
+            <label>Name of the Exam</label>
+            <input type="text" id="pscName" placeholder="e.g. SSE Mock 1">
+        </div>
+        <div class="input-group">
+            <label>Correct Answers (+2)</label>
+            <input type="number" id="pscCorrect" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Incorrect Answers (-0.666)</label>
+            <input type="number" id="pscIncorrect" placeholder="0">
+        </div>
+        <button class="calc-btn" onclick="calculate('cgpsc')">Calculate & Plot</button>
+    </div>
+
+    <div id="vyapam" class="calculator-section">
+        <div class="input-group">
+            <label>Name of the Exam</label>
+            <input type="text" id="vyaName" placeholder="e.g. Vyapam Practice">
+        </div>
+        <div class="input-group">
+            <label>Correct Answers (+1)</label>
+            <input type="number" id="vyaCorrect" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Incorrect Answers (-0.250)</label>
+            <input type="number" id="vyaIncorrect" placeholder="0">
+        </div>
+        <button class="calc-btn" onclick="calculate('vyapam')">Calculate & Plot</button>
+    </div>
+</div>
+
+<div class="chart-container">
+    <h3 style="margin-top:0">Performance Trend</h3>
+    <canvas id="scoreChart"></canvas>
+</div>
+
+<div class="history-container" id="history-content">
+    <h3 style="margin:0">Score History</h3>
+    <table class="history-table" id="historyTable">
+        <thead>
+            <tr>
+                <th>Date/Time</th>
+                <th>Exam Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    
+    <div class="action-btns">
+        <button class="print-btn" onclick="window.print()">Print</button>
+        <button class="pdf-btn" onclick="downloadPDF()">Save PDF</button>
+        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+    </div>
+    <div class="print-footer">©Piyush Pandey</div>
+</div>
+
+<footer class="footer-line">©Piyush Pandey</footer>
+
+<div class="install-bar" id="installBar">
+    <span>Install on Android Device?</span>
+    <button class="install-btn" onclick="installApp()">Install App</button>
+</div>
+
+<script>
+    let scoresData = [];
+    let labelsData = [];
+    let scoreChart;
+    let deferredPrompt;
+
+    // Chart Initialization
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+    scoreChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labelsData,
+            datasets: [{
+                label: 'Marks',
+                data: scoresData,
+                borderColor: '#007bff',
+                fill: false,
+                tension: 0.1
+            }]
+        }
+    });
+
+    function openTab(tabName, event) {
+        let sections = document.getElementsByClassName("calculator-section");
+        let tabs = document.getElementsByClassName("tab-btn");
+        for (let s of sections) s.classList.remove("active");
+        for (let t of tabs) t.classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        event.currentTarget.classList.add("active");
+    }
+
+    function calculate(type) {
+        let corr, incorr, score, examName;
+        const now = new Date();
+        const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        if (type === 'cgpsc') {
+            examName = document.getElementById('pscName').value || "CGPSC Exam";
+            corr = parseFloat(document.getElementById('pscCorrect').value) || 0;
+            incorr = parseFloat(document.getElementById('pscIncorrect').value) || 0;
+            score = (corr * 2) - (incorr * 0.666);
+        } else {
+            examName = document.getElementById('vyaName').value || "Vyapam Exam";
+            corr = parseFloat(document.getElementById('vyaCorrect').value) || 0;
+            incorr = parseFloat(document.getElementById('vyaIncorrect').value) || 0;
+            score = (corr * 1) - (incorr * 0.250);
+        }
+
+        const finalScore = parseFloat(score.toFixed(3));
+        const tableBody = document.querySelector("#historyTable tbody");
+        const newRow = tableBody.insertRow(0);
+        newRow.innerHTML = `<td>${timeStr}</td><td>${examName}</td><td style="color:#28a745"><strong>${finalScore}</strong></td>`;
+
+        labelsData.push(examName);
+        scoresData.push(finalScore);
+        scoreChart.update();
+    }
+
+    function clearHistory() {
+        if(confirm("Clear all data?")) {
+            document.querySelector("#historyTable tbody").innerHTML = "";
+            scoresData.length = 0;
+            labelsData.length = 0;
+            scoreChart.update();
+        }
+    }
+
+    function downloadPDF() {
+        const element = document.body;
+        html2pdf().from(element).save('My_Marks_Piyush_Pandey.pdf');
+    }
+
+    // Install logic
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installBar').style.display = 'flex';
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert("To install: Click the 3 dots in Chrome menu and select 'Add to Home screen'");
+        }
+    }
+</script>
+
+</body>
+</html>
