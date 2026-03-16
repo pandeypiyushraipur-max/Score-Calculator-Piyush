@@ -28,7 +28,7 @@ Tap the "Install App" button at the bottom.
 If the automatic prompt doesn't appear, tap the three dots (⋮) in Chrome and select "Add to Home screen".
 3. Adding your Logo
 To use your own logo, look for this line in the code:
-<img src="https://drive.google.com/file/d/1ZqLi3ShQKP63BapRwAlhFErgW_5bvNDP/view?usp=drivesdk" alt="Logo">
+<img src="logo.jpg" alt="Logo">
 
 📝 Usage Instructions
 Select your exam category (CGPSC or CG Vyapam).
