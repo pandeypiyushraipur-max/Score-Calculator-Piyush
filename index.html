@@ -51,18 +51,18 @@
         label { display: block; margin-bottom: 5px; font-weight: 500; color: #444; font-size: 14px; }
         input { width: 100%; padding: 10px; border: 2px solid #e1e1e1; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
         
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .checkbox-group input { width: auto; cursor: pointer; }
+
         .calc-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background-color: #28a745; color: white; margin-top: 10px; font-size: 16px; }
 
-        /* Big Result Style */
         .result-display {
             margin-top: 20px;
             text-align: center;
             font-size: 28px;
             font-weight: 800;
-            color: #1a2a3a;
             display: none;
             padding: 10px;
-            background: #e9ecef;
             border-radius: 8px;
         }
 
@@ -96,7 +96,7 @@
         .print-footer { display: none; }
     </style>
 </head>
-<body>
+<body onload="loadHistory()">
 
 <div class="logo-container">
     <img src="logo.jpg" alt="Logo">
@@ -112,26 +112,40 @@
     </div>
 
     <div id="cgpsc" class="calculator-section active">
-        <div class="input-group"><label>Exam Name</label><input type="text" id="pscName" placeholder="e.g. CGPSC 2026"></div>
-        <div class="input-group"><label>Correct Answers (+2)</label><input type="number" id="pscCorrect"></div>
-        <div class="input-group"><label>Incorrect Answers (-0.666)</label><input type="number" id="pscIncorrect"></div>
-        <button class="calc-btn" onclick="calculate('cgpsc')">Calculate Marks</button>
+        <form onsubmit="event.preventDefault(); calculate('cgpsc')">
+            <div class="input-group"><label>Exam Name</label><input type="text" id="pscName" placeholder="e.g. CGPSC 2026" required></div>
+            <div class="input-group"><label>Correct Answers (+2)</label><input type="number" id="pscCorrect" min="0" value="0" required></div>
+            <div class="input-group"><label>Incorrect Answers (-0.666)</label><input type="number" id="pscIncorrect" min="0" value="0" required></div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="pscNoNeg">
+                <label for="pscNoNeg">No Negative Marking</label>
+            </div>
+            <button type="submit" class="calc-btn">Calculate Marks</button>
+        </form>
     </div>
 
     <div id="vyapam" class="calculator-section">
-        <div class="input-group"><label>Exam Name</label><input type="text" id="vyaName" placeholder="e.g. Hostel Warden"></div>
-        <div class="input-group"><label>Correct Answers (+1)</label><input type="number" id="vyaCorrect"></div>
-        <div class="input-group"><label>Incorrect Answers (-0.250)</label><input type="number" id="vyaIncorrect"></div>
-        <button class="calc-btn" onclick="calculate('vyapam')">Calculate Marks</button>
+        <form onsubmit="event.preventDefault(); calculate('vyapam')">
+            <div class="input-group"><label>Exam Name</label><input type="text" id="vyaName" placeholder="e.g. Hostel Warden" required></div>
+            <div class="input-group"><label>Correct Answers (+1)</label><input type="number" id="vyaCorrect" min="0" value="0" required></div>
+            <div class="input-group"><label>Incorrect Answers (-0.250)</label><input type="number" id="vyaIncorrect" min="0" value="0" required></div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="vyaNoNeg">
+                <label for="vyaNoNeg">No Negative Marking</label>
+            </div>
+            <button type="submit" class="calc-btn">Calculate Marks</button>
+        </form>
     </div>
 
     <div id="other" class="calculator-section">
-        <div class="input-group"><label>Name of the Exam</label><input type="text" id="othName" placeholder="e.g. SSC / Railway"></div>
-        <div class="input-group"><label>No. of Correct Answers</label><input type="number" id="othCorr"></div>
-        <div class="input-group"><label>Marks for each Correct Answer</label><input type="number" id="othCorrMarks" step="0.1" placeholder="e.g. 2"></div>
-        <div class="input-group"><label>No. of Incorrect Answers</label><input type="number" id="othIncorr"></div>
-        <div class="input-group"><label>Penalty for each Incorrect Answer</label><input type="number" id="othIncorrMarks" step="0.1" placeholder="e.g. 0.5"></div>
-        <button class="calc-btn" onclick="calculate('other')">Calculate Marks</button>
+        <form onsubmit="event.preventDefault(); calculate('other')">
+            <div class="input-group"><label>Name of the Exam</label><input type="text" id="othName" placeholder="e.g. SSC / Railway" required></div>
+            <div class="input-group"><label>No. of Correct Answers</label><input type="number" id="othCorr" min="0" value="0" required></div>
+            <div class="input-group"><label>Marks for each Correct Answer</label><input type="number" id="othCorrMarks" step="0.1" placeholder="e.g. 2" required></div>
+            <div class="input-group"><label>No. of Incorrect Answers</label><input type="number" id="othIncorr" min="0" value="0" required></div>
+            <div class="input-group"><label>Penalty for each Incorrect Answer</label><input type="number" id="othIncorrMarks" step="0.1" placeholder="e.g. 0.5" required></div>
+            <button type="submit" class="calc-btn">Calculate Marks</button>
+        </form>
     </div>
 
     <div id="finalResult" class="result-display"></div>
@@ -176,6 +190,7 @@
     let scoreChart;
     let deferredPrompt;
 
+    // Initialize Chart
     const ctx = document.getElementById('scoreChart').getContext('2d');
     scoreChart = new Chart(ctx, {
         type: 'line',
@@ -208,44 +223,74 @@
         const timeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
         if (type === 'cgpsc') {
-            examName = document.getElementById('pscName').value || "CGPSC Exam";
-            corr = parseFloat(document.getElementById('pscCorrect').value) || 0;
-            incorr = parseFloat(document.getElementById('pscIncorrect').value) || 0;
-            score = (corr * 2) - (incorr * 0.666);
+            examName = document.getElementById('pscName').value;
+            corr = parseFloat(document.getElementById('pscCorrect').value);
+            incorr = parseFloat(document.getElementById('pscIncorrect').value);
+            let isNoNeg = document.getElementById('pscNoNeg').checked;
+            score = isNoNeg ? (corr * 2) : (corr * 2) - (incorr * 0.666);
         } else if (type === 'vyapam') {
-            examName = document.getElementById('vyaName').value || "Vyapam Exam";
-            corr = parseFloat(document.getElementById('vyaCorrect').value) || 0;
-            incorr = parseFloat(document.getElementById('vyaIncorrect').value) || 0;
-            score = (corr * 1) - (incorr * 0.250);
+            examName = document.getElementById('vyaName').value;
+            corr = parseFloat(document.getElementById('vyaCorrect').value);
+            incorr = parseFloat(document.getElementById('vyaIncorrect').value);
+            let isNoNeg = document.getElementById('vyaNoNeg').checked;
+            score = isNoNeg ? (corr * 1) : (corr * 1) - (incorr * 0.250);
         } else {
-            examName = document.getElementById('othName').value || "Other Exam";
-            let c = parseFloat(document.getElementById('othCorr').value) || 0;
-            let cm = parseFloat(document.getElementById('othCorrMarks').value) || 0;
-            let i = parseFloat(document.getElementById('othIncorr').value) || 0;
-            let im = parseFloat(document.getElementById('othIncorrMarks').value) || 0;
+            examName = document.getElementById('othName').value;
+            let c = parseFloat(document.getElementById('othCorr').value);
+            let cm = parseFloat(document.getElementById('othCorrMarks').value);
+            let i = parseFloat(document.getElementById('othIncorr').value);
+            let im = parseFloat(document.getElementById('othIncorrMarks').value);
             score = (c * cm) - (i * im);
         }
 
         const finalScore = parseFloat(score.toFixed(3));
+        const record = { time: timeStr, name: examName, score: finalScore };
+
+        saveToLocalStorage(record);
+        updateUI(record);
+    }
+
+    function updateUI(record) {
+        const scoreColor = record.score < 50 ? '#dc3545' : '#28a745';
         
-        // Show Bold Result below button
+        // Update Result Display
         const resDiv = document.getElementById('finalResult');
-        resDiv.innerHTML = `Your Marks: ${finalScore}`;
+        resDiv.innerHTML = `Your Marks: ${record.score}`;
+        resDiv.style.color = scoreColor;
+        resDiv.style.backgroundColor = record.score < 50 ? '#fff5f5' : '#f6fff6';
         resDiv.style.display = 'block';
 
-        // Update Table & Chart
+        // Add to Table
         const tableBody = document.querySelector("#historyTable tbody");
         const newRow = tableBody.insertRow(0);
-        newRow.innerHTML = `<td>${timeStr}</td><td>${examName}</td><td style="color:#28a745"><strong>${finalScore}</strong></td>`;
-        labelsData.push(examName);
-        scoresData.push(finalScore);
+        newRow.innerHTML = `<td>${record.time}</td><td>${record.name}</td><td style="color:${scoreColor}"><strong>${record.score}</strong></td>`;
+        
+        // Add to Chart
+        labelsData.push(record.name);
+        scoresData.push(record.score);
         scoreChart.update();
     }
 
+    function saveToLocalStorage(record) {
+        let history = JSON.parse(localStorage.getItem('examHistory')) || [];
+        history.push(record);
+        localStorage.setItem('examHistory', JSON.stringify(history));
+    }
+
+    function loadHistory() {
+        let history = JSON.parse(localStorage.getItem('examHistory')) || [];
+        // Loop through history to populate table and chart
+        history.forEach(item => {
+            updateUI(item);
+        });
+    }
+
     function clearHistory() {
-        if(confirm("Reset everything?")) {
+        if(confirm("This will delete all saved history. Continue?")) {
+            localStorage.removeItem('examHistory');
             document.querySelector("#historyTable tbody").innerHTML = "";
-            scoresData.length = 0; labelsData.length = 0;
+            scoresData.length = 0; 
+            labelsData.length = 0;
             scoreChart.update();
             document.getElementById('finalResult').style.display = 'none';
         }
