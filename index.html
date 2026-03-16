@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Marks Calculator by Piyush Pandey</title>
+    <title>Exam Marks Calculator - Piyush Pandey</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="apple-touch-icon" href="logo.png">
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,13 +22,14 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            padding-bottom: 100px; /* Space for install button */
+            padding-bottom: 100px;
         }
         
         .logo-container { text-align: center; margin-bottom: 10px; }
         .logo-container img {
-            width: 80px; height: auto;
+            width: 80px; height: 80px; border-radius: 50%;
             border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            object-fit: cover;
         }
 
         .container {
@@ -38,25 +40,38 @@
 
         h1 { text-align: center; color: #1a2a3a; margin: 10px 0; font-size: 24px; }
         
-        .tabs { display: flex; justify-content: center; margin-bottom: 25px; border-bottom: 2px solid #eee; }
-        .tab-btn { padding: 12px 25px; cursor: pointer; border: none; background: none; font-size: 16px; font-weight: 600; color: #888; transition: 0.3s; }
+        .tabs { display: flex; justify-content: center; margin-bottom: 25px; border-bottom: 2px solid #eee; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 15px; cursor: pointer; border: none; background: none; font-size: 14px; font-weight: 600; color: #888; transition: 0.3s; }
         .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
         
         .calculator-section { display: none; }
         .calculator-section.active { display: block; }
         
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: #444; }
-        input { width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .input-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #444; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 2px solid #e1e1e1; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
         
-        .calc-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background-color: #28a745; color: white; margin-top: 10px; }
+        .calc-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background-color: #28a745; color: white; margin-top: 10px; font-size: 16px; }
+
+        /* Big Result Style */
+        .result-display {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a2a3a;
+            display: none;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
 
         .chart-container, .history-container {
             width: 100%; max-width: 700px; background: white; border-radius: 12px;
             padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;
         }
 
-        table.history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        table.history-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         .history-table th, .history-table td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
         
         .action-btns { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
@@ -64,29 +79,13 @@
         .print-btn { background-color: #007bff; color: white; flex: 1; }
         .clear-btn { background-color: #6c757d; color: white; flex: 1; }
 
-        /* Mobile Install Button Style */
         .install-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1a2a3a;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1a2a3a; color: white; padding: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 1000;
         }
-        .install-btn {
-            background: #007bff;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .install-btn { background: #007bff; color: white; padding: 8px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
 
         .footer-line { padding: 20px; color: #666; font-weight: 500; text-align: center; }
 
@@ -100,7 +99,7 @@
 <body>
 
 <div class="logo-container">
-    <img src="logo.jpg" alt="Logo">
+    <img src="logo.png" alt="Logo" onerror="this.src='https://img.icons8.com/fluency/96/test-passed.png'">
 </div>
 
 <div class="container">
@@ -109,39 +108,33 @@
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab('cgpsc', event)">CGPSC</button>
         <button class="tab-btn" onclick="openTab('vyapam', event)">CG Vyapam</button>
+        <button class="tab-btn" onclick="openTab('other', event)">Other Exams</button>
     </div>
 
     <div id="cgpsc" class="calculator-section active">
-        <div class="input-group">
-            <label>Name of the Exam</label>
-            <input type="text" id="pscName" placeholder="e.g. SSE Mock 1">
-        </div>
-        <div class="input-group">
-            <label>Correct Answers (+2)</label>
-            <input type="number" id="pscCorrect" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Incorrect Answers (-0.666)</label>
-            <input type="number" id="pscIncorrect" placeholder="0">
-        </div>
-        <button class="calc-btn" onclick="calculate('cgpsc')">Calculate & Plot</button>
+        <div class="input-group"><label>Exam Name</label><input type="text" id="pscName" placeholder="e.g. CGPSC 2026"></div>
+        <div class="input-group"><label>Correct Answers (+2)</label><input type="number" id="pscCorrect"></div>
+        <div class="input-group"><label>Incorrect Answers (-0.666)</label><input type="number" id="pscIncorrect"></div>
+        <button class="calc-btn" onclick="calculate('cgpsc')">Calculate Marks</button>
     </div>
 
     <div id="vyapam" class="calculator-section">
-        <div class="input-group">
-            <label>Name of the Exam</label>
-            <input type="text" id="vyaName" placeholder="e.g. Vyapam Practice">
-        </div>
-        <div class="input-group">
-            <label>Correct Answers (+1)</label>
-            <input type="number" id="vyaCorrect" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Incorrect Answers (-0.250)</label>
-            <input type="number" id="vyaIncorrect" placeholder="0">
-        </div>
-        <button class="calc-btn" onclick="calculate('vyapam')">Calculate & Plot</button>
+        <div class="input-group"><label>Exam Name</label><input type="text" id="vyaName" placeholder="e.g. Hostel Warden"></div>
+        <div class="input-group"><label>Correct Answers (+1)</label><input type="number" id="vyaCorrect"></div>
+        <div class="input-group"><label>Incorrect Answers (-0.250)</label><input type="number" id="vyaIncorrect"></div>
+        <button class="calc-btn" onclick="calculate('vyapam')">Calculate Marks</button>
     </div>
+
+    <div id="other" class="calculator-section">
+        <div class="input-group"><label>Name of the Exam</label><input type="text" id="othName" placeholder="e.g. SSC / Railway"></div>
+        <div class="input-group"><label>No. of Correct Answers</label><input type="number" id="othCorr"></div>
+        <div class="input-group"><label>Marks for each Correct Answer</label><input type="number" id="othCorrMarks" step="0.1" placeholder="e.g. 2"></div>
+        <div class="input-group"><label>No. of Incorrect Answers</label><input type="number" id="othIncorr"></div>
+        <div class="input-group"><label>Penalty for each Incorrect Answer</label><input type="number" id="othIncorrMarks" step="0.1" placeholder="e.g. 0.5"></div>
+        <button class="calc-btn" onclick="calculate('other')">Calculate Marks</button>
+    </div>
+
+    <div id="finalResult" class="result-display"></div>
 </div>
 
 <div class="chart-container">
@@ -163,18 +156,18 @@
     </table>
     
     <div class="action-btns">
-        <button class="print-btn" onclick="window.print()">Print</button>
+        <button class="print-btn" onclick="window.print()">Print Report</button>
         <button class="pdf-btn" onclick="downloadPDF()">Save PDF</button>
-        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+        <button class="clear-btn" onclick="clearHistory()">Reset</button>
     </div>
     <div class="print-footer">©Piyush Pandey</div>
 </div>
 
 <footer class="footer-line">©Piyush Pandey</footer>
 
-<div class="install-bar" id="installBar">
-    <span>Install on Android Device?</span>
-    <button class="install-btn" onclick="installApp()">Install App</button>
+<div class="install-bar" id="installBar" style="display:none;">
+    <span>Install App on Android</span>
+    <button class="install-btn" onclick="installApp()">Install</button>
 </div>
 
 <script>
@@ -183,7 +176,6 @@
     let scoreChart;
     let deferredPrompt;
 
-    // Chart Initialization
     const ctx = document.getElementById('scoreChart').getContext('2d');
     scoreChart = new Chart(ctx, {
         type: 'line',
@@ -193,8 +185,9 @@
                 label: 'Marks',
                 data: scoresData,
                 borderColor: '#007bff',
-                fill: false,
-                tension: 0.1
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                fill: true,
+                tension: 0.3
             }]
         }
     });
@@ -206,6 +199,7 @@
         for (let t of tabs) t.classList.remove("active");
         document.getElementById(tabName).classList.add("active");
         event.currentTarget.classList.add("active");
+        document.getElementById('finalResult').style.display = 'none';
     }
 
     function calculate(type) {
@@ -218,55 +212,61 @@
             corr = parseFloat(document.getElementById('pscCorrect').value) || 0;
             incorr = parseFloat(document.getElementById('pscIncorrect').value) || 0;
             score = (corr * 2) - (incorr * 0.666);
-        } else {
+        } else if (type === 'vyapam') {
             examName = document.getElementById('vyaName').value || "Vyapam Exam";
             corr = parseFloat(document.getElementById('vyaCorrect').value) || 0;
             incorr = parseFloat(document.getElementById('vyaIncorrect').value) || 0;
             score = (corr * 1) - (incorr * 0.250);
+        } else {
+            examName = document.getElementById('othName').value || "Other Exam";
+            let c = parseFloat(document.getElementById('othCorr').value) || 0;
+            let cm = parseFloat(document.getElementById('othCorrMarks').value) || 0;
+            let i = parseFloat(document.getElementById('othIncorr').value) || 0;
+            let im = parseFloat(document.getElementById('othIncorrMarks').value) || 0;
+            score = (c * cm) - (i * im);
         }
 
         const finalScore = parseFloat(score.toFixed(3));
+        
+        // Show Bold Result below button
+        const resDiv = document.getElementById('finalResult');
+        resDiv.innerHTML = `Your Marks: ${finalScore}`;
+        resDiv.style.display = 'block';
+
+        // Update Table & Chart
         const tableBody = document.querySelector("#historyTable tbody");
         const newRow = tableBody.insertRow(0);
         newRow.innerHTML = `<td>${timeStr}</td><td>${examName}</td><td style="color:#28a745"><strong>${finalScore}</strong></td>`;
-
         labelsData.push(examName);
         scoresData.push(finalScore);
         scoreChart.update();
     }
 
     function clearHistory() {
-        if(confirm("Clear all data?")) {
+        if(confirm("Reset everything?")) {
             document.querySelector("#historyTable tbody").innerHTML = "";
-            scoresData.length = 0;
-            labelsData.length = 0;
+            scoresData.length = 0; labelsData.length = 0;
             scoreChart.update();
+            document.getElementById('finalResult').style.display = 'none';
         }
     }
 
     function downloadPDF() {
         const element = document.body;
-        html2pdf().from(element).save('My_Marks_Piyush_Pandey.pdf');
+        html2pdf().from(element).save('Marks_Report_Piyush.pdf');
     }
 
-    // Install logic
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+        e.preventDefault(); deferredPrompt = e;
         document.getElementById('installBar').style.display = 'flex';
     });
 
     function installApp() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                }
-                deferredPrompt = null;
-            });
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
         } else {
-            alert("To install: Click the 3 dots in Chrome menu and select 'Add to Home screen'");
+            alert("Use Chrome menu 'Add to Home screen' to install.");
         }
     }
 </script>
